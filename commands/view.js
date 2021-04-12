@@ -32,8 +32,6 @@ function viewTree(dirPath, indent) {
 
 		let content = util.listContentFn(dirPath);
 
-		// console.log(content);
-
 		// RECURSION
 
 		for (let i = 0; i < content.length; i++) {

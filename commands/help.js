@@ -1,3 +1,4 @@
+// SHOWS THE LIST OF ALL COMMANDS
 function help() {
 	console.log(`List of all the commands
     1. node mycli.js view <dirname> tree

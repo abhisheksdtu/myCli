@@ -17,7 +17,6 @@ switch (cmd) {
 	case 'view':
 		// view as flat & tree
 		// console.log(input[1]);
-		// console.log(input[2]);
 		viewObj.viewFn(input[1], input[2]);
 		break;
 
