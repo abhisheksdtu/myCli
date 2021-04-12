@@ -3,25 +3,30 @@
 // flat
 // organize
 // help
-let viewfnObj = require('./commands/view');
-let helpfnObj = require('./commands/help');
-let organizefnObj = require('./commands/organize');
+
+let viewObj = require('./commands/view');
+let helpObj = require('./commands/help');
+let organizeObj = require('./commands/organize');
+
 let input = process.argv.slice(2);
 // console.log(input);
-// console.log(input);
+
 let cmd = input[0];
+
 switch (cmd) {
 	case 'view':
-		//view as tree
-		// view as flat
-		// recursion
-		viewfnObj.viewfn(input[1], input[2]);
+		// view as flat & tree
+		// console.log(input[1]);
+		// console.log(input[2]);
+		viewObj.viewFn(input[1], input[2]);
 		break;
+
 	case 'organize':
-		organizefnObj.organize(input[1]);
+		organizeObj.organizeFn(input[1]);
 		break;
+
 	case 'help':
-		helpfnObj.helpfn();
+		helpObj.helpFn();
 		break;
 
 	default:

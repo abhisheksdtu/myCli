@@ -1,5 +1,5 @@
-let fs = require('fs');
 let path = require('path');
+let util = require('../utilities/util');
 
 let types = {
 	media: ['mp4', 'mkv', 'mp3'],
@@ -22,79 +22,85 @@ let types = {
 	app: ['exe', 'dmg', 'pkg', 'deb'],
 };
 
-function dirCreator(dirpath) {
-	if (fs.existsSync(dirpath) == false) {
-		fs.mkdirSync(dirpath);
-	}
-}
+function organize(dirPath) {
+	let orgFilePath = path.join(dirPath, 'organized_files');
 
-function GetDirectoryName(dirpath) {
-	let strArr = dirpath.split('.');
-	let ext = strArr.pop();
-	console.log(ext);
-
-	for (let key in types) {
-		// types[type].includes(ext);
-		for (let i = 0; i < types[key].length; i++) {
-			if (types[key][i] == ext) {
-				return key;
-			}
-		}
-	}
-	return 'others';
-}
-
-function isFileorNOt(dirpath) {
-	return fs.lstatSync(dirpath).isFile();
-}
-function listContent(dirpath) {
-	return fs.readdirSync(dirpath);
-}
-
-function copyFilleToFolder(dirpath, destFolder) {
-	let orgFileName = path.basename(dirpath);
-	let destFilePath = path.join(destFolder, orgFileName);
-	fs.copyFileSync(dirpath, destFilePath);
-}
-
-function OrganizeDir(dirpath, indent) {
-	let isFile = isFileorNOt(dirpath);
-
-	if (isFile == true) {
-		// IDENTIFY ->DEST DIRECTORY
-		// COPY
-		let folderName = GetDirectoryName(dirpath);
-		console.log(dirpath, '->', folderName);
-
-		// ORGANIZED FOLDER PATH
-
-		let destFolder = path.join(orgFilePath, folderName);
-		copyFilleToFolder(dirpath, destFolder);
-	} else {
-		let content = listContent(dirpath);
-		for (let i = 0; i < content.length; i++) {
-			let childPath = path.join(dirpath, content[i]);
-			OrganizeDir(childPath);
-		}
-	}
-}
-
-function organizeFn(dirpath) {
-	let orgFilePath = path.join(dirpath, 'organized_files');
-	dirCreator(orgFilePath);
+	util.directoryCreatorFn(orgFilePath);
 
 	for (let key in types) {
 		let innerDirPath = path.join(orgFilePath, key);
-		dirCreator(innerDirPath);
+		util.directoryCreatorFn(innerDirPath);
 	}
 
 	// OTHERS
 	let otherPath = path.join(orgFilePath, 'others');
-	dirCreator(otherPath);
+	util.directoryCreatorFn(otherPath);
 
-	OrganizeDir(dirpath);
+	organizeDir(dirPath, orgFilePath);
+}
+
+function organizeDir(dirPath, orgFilePath) {
+	// console.log(dirPath);
+
+	let isFile = util.isFileOrNotFn(dirPath);
+
+	if (isFile) {
+		// IDENTIFY DEST DIRECTORY
+
+		let folderName = getDirectoryName(dirPath);
+
+		// console.log(dirPath + ' -> ' + folderName);
+
+		let destFolder = path.join(orgFilePath, folderName);
+
+		// console.log(destFolder);
+
+		// COPY FILE (dirPath) TO FOLDER(destFolder)
+		copyFileToFolder(dirPath, destFolder);
+	} else {
+		let content = util.listContentFn(dirPath);
+
+		// RECURSION
+		for (let i = 0; i < content.length; i++) {
+			let childPath = path.join(dirPath, content[i]);
+
+			organizeDir(childPath);
+		}
+	}
+}
+
+function copyFileToFolder(dirPath, destFolder) {
+	let orgFileName = path.basename(dirPath);
+	let destFilePath = path.join(destFolder, orgFileName);
+	fs.copyFileSync(dirPath, destFilePath);
+}
+
+function getDirectoryName(dirPath) {
+	let extName = path.extname(dirPath);
+
+	let ext = extName.substring(1);
+
+	// console.log(ext);
+
+	for (let key in types) {
+		if (types[key].includes(ext)) {
+			return key;
+		}
+
+		// console.log(types[key].includes(ext));
+
+		// INCLUDES & THIS FOR WORKS SAME
+
+		// for (let i = 0; i < types[key].length; i++) {
+		// 	if (types[i] == ext) {
+		// 		return key;
+		// 	}
+		// }
+	}
+
+	return 'others';
 }
 
 module.exports = {
-    organize: organizeFn
+	organizeFn: organize,
 };
